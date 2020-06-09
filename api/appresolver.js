@@ -79,7 +79,7 @@ class AppResolver {
             if(file.indexOf("..") != -1) return res.status(400).json({status: "fail", reason: "file name cannot contain traversal"})
 
             if(!fs.existsSync(path.join(__dirname, '..', 'data', req.username, app, file))) {
-                fs.writeFileSync(path.join(__dirname, '..', 'data', req.username, app, file));
+                fs.writeFileSync(path.join(__dirname, '..', 'data', req.username, app, file), "");
 
                 res.status(200).json({status: "complete"})
             } else {
