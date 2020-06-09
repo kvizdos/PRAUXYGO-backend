@@ -85,13 +85,13 @@ module.exports.tests = (request) => {
 
         global.secondprojectid = res.body.id;
 
-        const baseItem = fs.createWriteStream(path.join(__dirname, '..', 'data', 'testfreeuser', res.body.id, 'index.html'));
-        baseItem.write("<html>\n<head>\n<title>Hello World</title>\n</head>\n<body>\n<p>Hello World</p>\n</body></html>")
-        baseItem.end();
+        // const baseItem = fs.createWriteStream(path.join(__dirname, '..', 'data', 'testfreeuser', res.body.id, 'index.html'));
+        // baseItem.write("<html>\n<head>\n<title>Hello World</title>\n</head>\n<body>\n<p>Hello World</p>\n</body></html>")
+        // baseItem.end();
 
-        const unchangedFile = fs.createWriteStream(path.join(__dirname, '..', 'data', 'testfreeuser', res.body.id, 'hello.txt'));
-        unchangedFile.write("Hello World!")
-        unchangedFile.end();
+        // const unchangedFile = fs.createWriteStream(path.join(__dirname, '..', 'data', 'testfreeuser', res.body.id, 'hello.txt'));
+        // unchangedFile.write("Hello World!")
+        // unchangedFile.end();
 
         done();
     })

@@ -64,6 +64,7 @@ class Authenticator {
             const app = req.hostname.split(".")[0];
 
             if(isValidToken.projects.findIndex(i => i.id == app) != -1) {
+                req.username = isValidToken.username;
                 next();
             } else {
                 res.status(401).json({status: "fail", reason: "you do not have access"})

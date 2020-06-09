@@ -68,6 +68,25 @@ class AppResolver {
             res.json(files)
         })
 
+        app.post("/prauxyapi/new/file", this.auth.canViewApp("manage"), async(req, res) => {
+            const file = req.body.file;
+            const app = req.hostname.split(".")[0];
+
+            if(file == undefined) return res.status(400).json({status: "fail", reason: "invalid params"})
+        
+            if(file.indexOf(".") == -1) return res.status(400).json({status: "fail", reason: "file must contain a period"});
+
+            if(file.indexOf("..") != -1) return res.status(400).json({status: "fail", reason: "file name cannot contain traversal"})
+
+            if(!fs.existsSync(path.join(__dirname, '..', 'data', req.username, app, file))) {
+                fs.writeFileSync(path.join(__dirname, '..', 'data', req.username, app, file));
+
+                res.status(200).json({status: "complete"})
+            } else {
+                res.status(409).json({status: "fail", reason: "file exists"});
+            }
+        })
+
         app.post("/prauxyapi/update", this.auth.canViewApp("manage"), async (req, res) => {
             const app = req.hostname.split(".")[0];
             const file = req.body.file,
