@@ -230,8 +230,4 @@ module.exports.tests = (request) => {
 
         done();
     })
-
-    test("this will fail", () => {
-        expect(2).toBe(1);
-    })
 }
