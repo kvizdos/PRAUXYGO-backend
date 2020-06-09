@@ -118,7 +118,7 @@ describe("Authorization Tests", () => {
         const res = await request.post("/login")
                                  .send({
                                      username: "testuser",
-                                     password: "password"
+                                     password: "passwords"
                                  }).set('Host', "auth.go.prauxy.app");
 
         expect(res.status).toBe(200);
