@@ -1,14 +1,4 @@
-const supertest = require('supertest');
-const app = require('../index');
-
-const request = supertest(app.app);
-
-beforeAll(async () => {
-    process.env.NODE_ENV = "test";
-    await global.MongoTests.setupTestEnvironment();
-})
-
-describe("Authorization Tests", () => {
+module.exports.tests = (request) => {
     test("it should catch missing parameters in registration", async (done) => {
         const res = await request.post("/register").send({username: "test"}).set('Host', "auth.go.prauxy.app");
 
@@ -33,6 +23,29 @@ describe("Authorization Tests", () => {
         expect(res.status).toBe(200);
         expect(res.body.registered).toBe(true);
         expect(res.body.token).toHaveLength(180);
+        expect(res.body.plan).toBe("pro");
+        expect(res.body.endDate).toMatch(/.{4}-.{2}-.{2}T.{2}:.{2}:.{2}\..{4}/)
+
+        done();
+    })
+
+    test("it should register a free user", async (done) => {
+        const res = await request.post("/register")
+                                 .send({
+                                     username: "testfreeuser",
+                                     password: "password",
+                                     email: "testingfree@prauxy.app",
+                                     name: "Test Free Name",
+                                     org: "PRAUXY Tests",
+                                     mailinglist: false,
+                                     plan: "free"
+                                 }).set('Host', "auth.go.prauxy.app");
+
+        expect(res.status).toBe(200);
+        expect(res.body.registered).toBe(true);
+        expect(res.body.token).toHaveLength(180);
+        expect(res.body.plan).toBe("free");
+        expect(res.body.endDate).toBe(-1);
 
         done();
     })
@@ -119,13 +132,24 @@ describe("Authorization Tests", () => {
                                  .send({
                                      username: "testuser",
                                      password: "password"
-                                 }).set('Host', "auth.go.prauxy.app");
+                                 }).set('Host', "auth.go.prauxy.app");        
 
+        const res2 = await request.post("/login")
+                                  .send({
+                                      username: "testfreeuser",
+                                      password: "password"
+                                  }).set('Host', "auth.go.prauxy.app");
+                                    
         expect(res.status).toBe(200);
         expect(res.body.authenticated).toBe(true);
         expect(res.body.token).toHaveLength(180);
 
+        expect(res2.status).toBe(200);
+        expect(res2.body.authenticated).toBe(true);
+        expect(res2.body.token).toHaveLength(180);
+
         global.authtoken = res.body.token;
+        global.authtoken2 = res2.body.token;
 
         done();
     })
@@ -206,4 +230,4 @@ describe("Authorization Tests", () => {
 
         done();
     })
-})
+}

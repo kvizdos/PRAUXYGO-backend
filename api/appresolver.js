@@ -46,6 +46,10 @@ class AppResolver {
     }
 
     getRoutes() { return this.router }
+
+    getInjectedJs() {
+        return INJECTEDJAVASCRIPT;
+    }
     
     registerRoutes(app) {
         app.get("/prauxyapi", this.auth.canViewApp("manage"), async (req, res) => {
@@ -69,32 +73,23 @@ class AppResolver {
             const file = req.body.file,
                   contents = req.body.contents;
 
-            console.log("here")
-
-            console.log(file);
-            console.log(contents)
-
             if(file == "" || file == undefined || file.indexOf("..") >= 0 || contents == undefined) return res.status(400).json({status: "fail", reason: "invalid params"})
 
-            console.log("here 2")
-
             let appInfo = await this.mongo.find("users", {projects: { $elemMatch: { id: app } }});
-
-            console.log("here 3")
 
             if(appInfo.length == 0) {
                 return res.status(404).send("Unknown site")
             }
-
-            console.log("here 4")
-
             appInfo = appInfo[0];
 
-            console.log("about 2 write " + path.join(__dirname, '..', 'data', appInfo.username, app, file));
+            if(fs.existsSync(path.join(__dirname, '..', 'data', appInfo.username, app, file))) {
 
-            fs.writeFileSync(path.join(__dirname, '..', 'data', appInfo.username, app, file), contents);
-            
-            res.json({status: "complete"})
+                fs.writeFileSync(path.join(__dirname, '..', 'data', appInfo.username, app, file), contents);
+                
+                res.json({status: "complete"})
+            } else {
+                res.status(400).json({status: "fail", reason: "invalid file"})
+            }
         })
         
         app.get("/*", async (req, res) => {

@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --forceExit"
+    "test": "jest --forceExit",
+    "coverage": "jest --coverage --forceExit"
   },
   "author": "",
   "license": "ISC",
@@ -19,6 +20,7 @@
   "devDependencies": {
     "jest": "^26.0.1",
     "mongodb-memory-server": "^6.6.1",
+    "rimraf": "^3.0.2",
     "supertest": "^4.0.2"
   }
 }

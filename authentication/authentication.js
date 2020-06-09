@@ -2,6 +2,8 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const Roles = require("./roles");
 const express = require("express");
+const fs = require('fs');
+const path = require('path');
 
 class Authenticator {
     constructor(mongo) {
@@ -42,7 +44,7 @@ class Authenticator {
             const userPermissions = this.roles.getRolePerms(isValidToken.plan)
 
             if(flag != undefined) {
-                if((matches != undefined && userPermissions[flag] == matches) || (flag != "projectCap" ? userPermissions[flag] == true : (userPermissions[flag] == -1 || userPermissions[flag] > isValidHeader.projects.length))) {
+                if((matches != undefined && userPermissions[flag] == matches) || (flag != "projectCap" ? userPermissions[flag] == true : (userPermissions[flag] == -1 || userPermissions[flag] > isValidToken.projects.length))) {
                     next();
                 } else {
                     return res.status(401).send({status: "fail", reason: (flag != "projectCap" ? "no permission" : "exceeded project cap")})
@@ -111,22 +113,30 @@ class Authenticator {
                   email       = req.body.email,
                   name        = req.body.name,
                   org         = req.body.org || "Unspecified",
-                  mailinglist = req.body.mailinglist;
+                  mailinglist = req.body.mailinglist,
+                  plan        = req.body.plan || "pro";
             
             if(username == undefined || name == undefined || password == undefined || email == undefined) return res.status(400).json({registered: false, reason: "invalid params"})
 
             let t = await this.mongo.find("users", {$or: [ { username: username}, { email: email } ]});
             if(t.length == 0) {
                     bcrypt.genSalt(saltRounds, async (err, salt) => {
-                        bcrypt.hash(password, salt, (err, hash) => {
+                        bcrypt.hash(password, salt, async (err, hash) => {
                             try {
                                 let token = this.createToken();
-                                res.status(200).json({registered: true, token: token});
-                                const endDate = new Date();
+
+                                fs.mkdirSync(path.join(__dirname, '..', 'data', username));    
+
+                                let endDate = new Date();
                                 endDate.setDate(endDate.getDate() + 7);
 
-                                const inserted = this.mongo.insert("users", { username: username, org: org, mailinglist: mailinglist, projects: [], password: hash, email: email, token: token, plan: 'pro', freeEndsOn: endDate, hasUpgraded: false});
+                                endDate = plan == "pro" ? endDate : -1;
+                                res.status(200).json({registered: true, plan: plan, endDate: endDate, token: token});
+
+                                await this.mongo.insert("users", { username: username, org: org, mailinglist: mailinglist, projects: [], password: hash, email: email, token: token, plan: plan, freeEndsOn: endDate, hasUpgraded: false});
+                            
                             } catch(e) {
+                                console.log(e)
                                 res.status(500).json({registered: false, reason: "unknown"})
                                 throw e;
                             }
