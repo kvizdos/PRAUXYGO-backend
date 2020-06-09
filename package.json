@@ -1,0 +1,24 @@
+{
+  "name": "prauxygo-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --forceExit"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^4.0.1",
+    "body-parser": "^1.19.0",
+    "cheerio": "^1.0.0-rc.3",
+    "express": "^4.17.1",
+    "express-subdomain": "^1.0.5",
+    "mongodb": "^3.5.8"
+  },
+  "devDependencies": {
+    "jest": "^26.0.1",
+    "mongodb-memory-server": "^6.6.1",
+    "supertest": "^4.0.2"
+  }
+}
