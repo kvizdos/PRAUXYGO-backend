@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("path");
 const fs = require("fs")
 const cheerio = require("cheerio")
+const mkdirp = require("mkdirp")
 
 const INJECTEDJAVASCRIPT = `\n<!-- PRAUXYGO DEPENENCY INJECTION, DO NOT TOUCH --><script>window.ReactNativeWebView.postMessage(JSON.stringify({code: document.getElementsByTagName('html')[0].innerHTML})); const _prLOG = console.log, _prWARN = console.warn, _prERROR = console.error; console.log = (m) => { window.ReactNativeWebView.postMessage(JSON.stringify({message: m, type: "log"})); _prLOG(m); return m; }; console.warn = (m) => { window.ReactNativeWebView.postMessage(JSON.stringify({message: m, type: "warn"})); _prWARN(m); return m; }; console.error = (m) => { window.ReactNativeWebView.postMessage(JSON.stringify({message: m, type: "error"})); _prERROR(m); return m; }; this.window.addEventListener("message", (event) => { try { var resp = eval(JSON.parse(event.data).cmd); console.log(typeof resp == "object" ? JSON.stringify(resp) : resp.toString().trim()) } catch(e) { console.error(JSON.stringify(e.message)) }; });window.onerror = (error, url, line) => { console.error(JSON.stringify({type: "errorcaught", error: error, url: [...url.split("/")].slice(3).join("/") || "index.html", line: url.endsWith('.js') ? line += 1 : line})); };window.onabort = (e) => { console.error("Error " + e) };</script>`
 
@@ -79,9 +80,12 @@ class AppResolver {
             if(file.indexOf("..") != -1) return res.status(400).json({status: "fail", reason: "file name cannot contain traversal"})
 
             if(!fs.existsSync(path.join(__dirname, '..', 'data', req.username, app, file))) {
+                let tmpPath = file.split("/");
+                tmpPath.pop();
+                if(tmpPath.length > 0) mkdirp.sync(path.join(__dirname, '..', 'data', req.username, app, ...tmpPath))
                 fs.writeFileSync(path.join(__dirname, '..', 'data', req.username, app, file), "");
+                res.status(200).json({status: "complete"});
 
-                res.status(200).json({status: "complete"})
             } else {
                 res.status(409).json({status: "fail", reason: "file exists"});
             }

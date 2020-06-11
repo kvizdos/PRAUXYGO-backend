@@ -1,3 +1,6 @@
+const fs = require('fs');
+const path = require('path');
+
 module.exports.tests = (request, injectedJS) => {
     test("it should allow a user to create a file", async (done) => {
         const res = await request.post("/prauxyapi/new/file")
@@ -15,6 +18,31 @@ module.exports.tests = (request, injectedJS) => {
 
         expect(res2.status).toBe(200);
         expect(res2.body.status).toBe("complete");
+
+        done();
+    })
+
+    test("it should create a directory for a new file if it doesn't already exist", async (done) => {
+        const res = await request.post("/prauxyapi/new/file")
+                                 .send({file: "test/abc/woah.txt"})
+                                 .set("Authorization", "Bearer testfreeuser:" + global.authtoken2)
+                                 .set('Host', global.secondprojectid + ".go.prauxy.app");
+        
+        expect(res.status).toBe(200);
+        expect(res.body.status).toBe("complete");
+
+        done();
+    })
+
+    test("it should place files that start with / in the root project directory", async (done) => {
+        const res = await request.post("/prauxyapi/new/file")
+                                 .send({file: "/thisbetterberight.txt"})
+                                 .set("Authorization", "Bearer testfreeuser:" + global.authtoken2)
+                                 .set('Host', global.secondprojectid + ".go.prauxy.app");
+        
+        const fileExists = fs.existsSync(path.join(__dirname, '..', 'data', 'testfreeuser', global.secondprojectid, 'thisbetterberight.txt'));
+
+        expect(fileExists).toBe(true)
 
         done();
     })
@@ -48,6 +76,19 @@ module.exports.tests = (request, injectedJS) => {
     test("it shouldn't allow for creation of duplicate files", async (done) => {
         const res = await request.post("/prauxyapi/new/file")
                                  .send({file: "hello.txt"})
+                                 .set("Authorization", "Bearer testfreeuser:" + global.authtoken2)
+                                 .set('Host', global.secondprojectid + ".go.prauxy.app");
+
+        expect(res.status).toBe(409);
+        expect(res.body.status).toBe("fail");
+        expect(res.body.reason).toBe("file exists")
+
+        done();
+    })
+
+    test("it shouldn't allow for creation of duplicate files inside of a directory", async (done) => {
+        const res = await request.post("/prauxyapi/new/file")
+                                 .send({file: "test/abc/woah.txt"})
                                  .set("Authorization", "Bearer testfreeuser:" + global.authtoken2)
                                  .set('Host', global.secondprojectid + ".go.prauxy.app");
 
@@ -148,7 +189,7 @@ module.exports.tests = (request, injectedJS) => {
                                  .set('Host', global.secondprojectid + ".go.prauxy.app");
 
         expect(res.status).toBe(200);
-        expect(res.body).toHaveLength(2);
+        expect(res.body).toHaveLength(4);
 
         done();
     })
