@@ -6,6 +6,8 @@ const cheerio = require('cheerio')
 const Authenticator = require('./authentication/authentication').Authenticator;
 const APIHandler = require('./api/apihandler').APIHandler;
 const AppResolver = require('./api/appresolver').AppResolver;
+const dotenv = require('dotenv');
+dotenv.config();
 
 const DatabaseHelper = require('./helpers/mongo');
 const MongoHelper = new DatabaseHelper.mongo();
@@ -24,11 +26,9 @@ const arServer = new AppResolver(MongoHelper, authServer)
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(subdomain("api.go", apiServer.getRoutes()))
-app.use(subdomain("auth.go", authServer.getRoutes()))
-app.use(subdomain("*.go", arServer.getRoutes()))
-
-// app.get('/', (req, res) => res.json('Hello World!'))
+app.use(subdomain(`api.${process.env.NODE_ENV == "dev" ? 'test' : ''}go`, apiServer.getRoutes()))
+app.use(subdomain(`auth.${process.env.NODE_ENV == "dev" ? 'test' : ''}go`, authServer.getRoutes()))
+app.use(subdomain(`*.${process.env.NODE_ENV == "dev" ? 'test' : ''}go`, arServer.getRoutes()))
 
 if(process.env.NODE_ENV != "test") {
     app.listen(8080, () => console.log('PrauxyGO backend started'))

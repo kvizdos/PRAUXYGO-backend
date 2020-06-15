@@ -69,25 +69,28 @@ class AppResolver {
             res.json(files)
         })
 
-        app.post("/prauxyapi/new/file", this.auth.canViewApp("manage"), async(req, res) => {
+        app.post("/prauxyapi/new/:type", this.auth.canViewApp("manage"), async(req, res) => {
             const file = req.body.file;
+            const type = req.params.type;
             const app = req.hostname.split(".")[0];
+
+            if(type != "file" && type != "folder") return res.status(404).json({status: "fail", reason: "invalid type"})
 
             if(file == undefined) return res.status(400).json({status: "fail", reason: "invalid params"})
         
-            if(file.indexOf(".") == -1) return res.status(400).json({status: "fail", reason: "file must contain a period"});
+            if(type == "file" && file.indexOf(".") == -1) return res.status(400).json({status: "fail", reason: "file must contain a period"});
+            if(type == "folder" && file.indexOf(".") != -1) return res.status(400).json({status: "fail", reason: "folder cannot contain a period"});
 
             if(file.indexOf("..") != -1) return res.status(400).json({status: "fail", reason: "file name cannot contain traversal"})
 
             if(!fs.existsSync(path.join(__dirname, '..', 'data', req.username, app, file))) {
                 let tmpPath = file.split("/");
-                tmpPath.pop();
+                if(type == "file") tmpPath.pop();
                 if(tmpPath.length > 0) mkdirp.sync(path.join(__dirname, '..', 'data', req.username, app, ...tmpPath))
-                fs.writeFileSync(path.join(__dirname, '..', 'data', req.username, app, file), "");
+                if(type == "file") fs.writeFileSync(path.join(__dirname, '..', 'data', req.username, app, file), "");
                 res.status(200).json({status: "complete"});
-
             } else {
-                res.status(409).json({status: "fail", reason: "file exists"});
+                res.status(409).json({status: "fail", reason: `${type} exists`});
             }
         })
 
@@ -117,6 +120,10 @@ class AppResolver {
         
         app.get("/*", async (req, res) => {
             const app = req.hostname.split(".")[0];
+
+            if(app == "testgo" || app == "go") {
+                return res.sendFile(path.join(__dirname, '..', 'static', 'launch', req.params[0] || "index.html"), 'utf8')
+            }
 
             let appInfo = await this.mongo.find("users", {projects: { $elemMatch: { id: app } }});
 

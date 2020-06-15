@@ -138,6 +138,95 @@ module.exports.tests = (request, injectedJS) => {
         done();
     })
 
+    test("it should allow for creation of folders", async (done) => {
+        const folderExistsPre = fs.existsSync(path.join(__dirname, '..', 'data', 'testfreeuser', global.secondprojectid, 'testfolders'));
+        expect(folderExistsPre).toBe(false);
+
+        const res = await request.post("/prauxyapi/new/folder")
+                                 .send({file: "testfolders"})
+                                 .set("Authorization", "Bearer testfreeuser:" + global.authtoken2)
+                                 .set('Host', global.secondprojectid + ".go.prauxy.app");
+
+        expect(res.status).toBe(200);
+        expect(res.body.status).toBe("complete");
+
+        const folderExistsPost = fs.existsSync(path.join(__dirname, '..', 'data', 'testfreeuser', global.secondprojectid, 'testfolders'));
+        expect(folderExistsPost).toBe(true);
+
+        done();
+    })
+
+    test("it should allow for creation of nested folders", async (done) => {
+        const res = await request.post("/prauxyapi/new/folder")
+                                 .send({file: "testfolders/wow"})
+                                 .set("Authorization", "Bearer testfreeuser:" + global.authtoken2)
+                                 .set('Host', global.secondprojectid + ".go.prauxy.app");
+
+        const folderExists = fs.existsSync(path.join(__dirname, '..', 'data', 'testfreeuser', global.secondprojectid, 'testfolders', 'wow'));
+
+        expect(res.status).toBe(200);
+        expect(res.body.status).toBe("complete");
+
+        expect(folderExists).toBe(true);
+
+        done();
+    })
+
+    test("it shouldn't allow for creation of duplicate folders", async (done) => {
+        const res = await request.post("/prauxyapi/new/folder")
+                                 .send({file: "testfolders"})
+                                 .set("Authorization", "Bearer testfreeuser:" + global.authtoken2)
+                                 .set('Host', global.secondprojectid + ".go.prauxy.app");
+
+        expect(res.status).toBe(409);
+        expect(res.body.status).toBe("fail");
+        expect(res.body.reason).toBe("folder exists")
+
+        done();
+    })
+
+    test("it should place files that start with / in the root project directory", async (done) => {
+        const res = await request.post("/prauxyapi/new/folder")
+                                 .send({file: "/testroot"})
+                                 .set("Authorization", "Bearer testfreeuser:" + global.authtoken2)
+                                 .set('Host', global.secondprojectid + ".go.prauxy.app");
+        
+        const fileExists = fs.existsSync(path.join(__dirname, '..', 'data', 'testfreeuser', global.secondprojectid, 'testroot'));
+        
+        expect(res.status).toBe(200);
+        expect(res.body.status).toBe("complete");
+
+        expect(fileExists).toBe(true)
+
+        done();
+    })
+
+    test("it should catch missing params when creating a folder", async (done) => {
+        const res = await request.post("/prauxyapi/new/folder")
+                                 .send({})
+                                 .set("Authorization", "Bearer testfreeuser:" + global.authtoken2)
+                                 .set('Host', global.secondprojectid + ".go.prauxy.app");
+
+        expect(res.status).toBe(400);
+        expect(res.body.status).toBe("fail");
+        expect(res.body.reason).toBe("invalid params")
+
+        done();
+    })
+
+    test("it shouldn't allow a . in the folder name", async (done) => {
+        const res = await request.post("/prauxyapi/new/folder")
+                                 .send({file: "blah.notafolder"})
+                                 .set("Authorization", "Bearer testfreeuser:" + global.authtoken2)
+                                 .set('Host', global.secondprojectid + ".go.prauxy.app");
+
+        expect(res.status).toBe(400);
+        expect(res.body.status).toBe("fail");
+        expect(res.body.reason).toBe("folder cannot contain a period")
+
+        done();
+    })
+
     test("it should deny updates to files that don't exist", async (done) => {
         const res = await request.post("/prauxyapi/update")
                                  .send({file: "hellos.txt", contents: "Hello world! (but updated again)"})
@@ -189,7 +278,7 @@ module.exports.tests = (request, injectedJS) => {
                                  .set('Host', global.secondprojectid + ".go.prauxy.app");
 
         expect(res.status).toBe(200);
-        expect(res.body).toHaveLength(4);
+        expect(res.body).toHaveLength(6);
 
         done();
     })
