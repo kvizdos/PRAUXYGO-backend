@@ -1,13 +1,12 @@
-<html>
+<!DOCTYPE html>
+<html lang="eng">
 	<head>
 		<title>PrauxyGO</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
 		<meta name="description" content="The easiest way to code on a tablet.">
 		<meta name="keywords" content="JavaScript, coding, tablet, ipad, IDE, nodejs, development, android, prauxy, prauxygo, console, inspect, inspector, tools, deploy, deployments">
 
-
-
-		<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+		<link rel="preload" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 		<link rel="stylesheet" type="text/css" href="style.css">
 		<!-- Global site tag (gtag.js) - Google Analytics -->
@@ -37,12 +36,12 @@
 					<h2>Get notified when we launch.</h2>
 					<form action="https://docs.google.com/forms/d/e/1FAIpQLSfI8QPVy2pHUWp74mR0hHII8NICHF1wS4gIoO-tpqvOD8-zmQ/formResponse" method="POST">
 						<div class="item">
-							<label>Your name</label>
-							<input name="entry.1679267437" required type="text" placeholder="Kenton Vizdos" />
+							<label for="nameInput">Your name</label>
+							<input id="nameInput" name="entry.1679267437" required type="text" placeholder="Kenton Vizdos" />
 						</div>
 						<div class="item">
-							<label>Your email</label>
-							<input name="entry.774034740" required type="email" placeholder="welcome@prauxy.app" />
+							<label for="emailInput">Your email</label>
+							<input id="emailInput" name="entry.774034740" required type="email" placeholder="welcome@prauxy.app" />
 						</div>
 						<input type="submit" value="Join">
 					</form>
@@ -91,7 +90,7 @@
 		</section>
 
 		<footer>
-			<p>&copy; 2020 <a href="https://kentonvizdos.com" target="_blank">Kenton Vizdos</a></p>
+			<p>&copy; 2020 <a rel="noopener" href="https://kentonvizdos.com" target="_blank">Kenton Vizdos</a></p>
 			<p>Proudly made using PRAUXY&trade; GO</p>
 		</footer>
 	</body>
