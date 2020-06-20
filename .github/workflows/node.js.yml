@@ -18,12 +18,12 @@ jobs:
         node-version: [10.x, 12.x, 14.x]
 
     steps:
-    - run: docker build docker/ --file docker/Dockerfile --tag prauxygo-nodejs
     - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
+    - run: docker build docker/ --file docker/Dockerfile --tag prauxygo-nodejs
     - run: npm install
     - run: npm test
     - run: ./node_modules/.bin/codecov --token="c9a1e4a6-4266-475c-b150-3667d8b10060"
