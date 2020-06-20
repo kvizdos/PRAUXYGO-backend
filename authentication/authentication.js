@@ -45,6 +45,7 @@ class Authenticator {
 
             if(flag != undefined) {
                 if((matches != undefined && userPermissions[flag] == matches) || (flag != "projectCap" ? userPermissions[flag] == true : (userPermissions[flag] == -1 || userPermissions[flag] > isValidToken.projects.length))) {
+                    req.username = isValidToken.username;
                     next();
                 } else {
                     return res.status(401).send({status: "fail", reason: (flag != "projectCap" ? "no permission" : "exceeded project cap")})

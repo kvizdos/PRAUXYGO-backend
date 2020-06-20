@@ -30,8 +30,45 @@ module.exports.tests = (request) => {
         expect(res.body.inserted).toBe(true);
         expect(res.body).toHaveProperty("id");
 
-        global.newprojectid = res.body.id;
+        done();
+    })
 
+    test("it should have created template files when a new project is created", async (done) => {
+        const staticRes = await request.post("/projects/new")
+                                 .send({
+                                    name: "Test Static App",
+                                    type: "static"
+                                 }) 
+                                 .set("Authorization", "Bearer testuser:" + global.authtoken)
+                                 .set('Host', "api.go.prauxy.app");
+
+        expect(staticRes.status).toBe(200);
+        expect(staticRes.body.inserted).toBe(true);
+        expect(staticRes.body).toHaveProperty("id");
+
+        const staticTemplateCreated = fs.existsSync(path.join(__dirname, '..', 'data', 'testuser', staticRes.body.id, 'index.html'));
+        
+        expect(staticTemplateCreated).toBe(true);
+
+        const nodejsRes = await request.post("/projects/new")
+                                 .send({
+                                    name: "Test NodeJS App",
+                                    type: "nodejs"
+                                 }) 
+                                 .set("Authorization", "Bearer testuser:" + global.authtoken)
+                                 .set('Host', "api.go.prauxy.app");
+
+        expect(nodejsRes.status).toBe(200);
+        expect(nodejsRes.body.inserted).toBe(true);
+        expect(nodejsRes.body).toHaveProperty("id");
+
+        const nodeTemplateCreatedIndex = fs.existsSync(path.join(__dirname, '..', 'data', 'testuser', nodejsRes.body.id, 'index.js'));
+        const nodeTemplateCreatedPackage = fs.existsSync(path.join(__dirname, '..', 'data', 'testuser', nodejsRes.body.id, 'package.json'));
+        
+        global.newprojectid = nodejsRes.body.id;
+
+        expect(nodeTemplateCreatedIndex).toBe(true);
+        expect(nodeTemplateCreatedPackage).toBe(true);
         done();
     })
 
@@ -84,14 +121,6 @@ module.exports.tests = (request) => {
         expect(res4.body.reason).toBe("exceeded project cap");
 
         global.secondprojectid = res.body.id;
-
-        // const baseItem = fs.createWriteStream(path.join(__dirname, '..', 'data', 'testfreeuser', res.body.id, 'index.html'));
-        // baseItem.write("<html>\n<head>\n<title>Hello World</title>\n</head>\n<body>\n<p>Hello World</p>\n</body></html>")
-        // baseItem.end();
-
-        // const unchangedFile = fs.createWriteStream(path.join(__dirname, '..', 'data', 'testfreeuser', res.body.id, 'hello.txt'));
-        // unchangedFile.write("Hello World!")
-        // unchangedFile.end();
 
         done();
     })

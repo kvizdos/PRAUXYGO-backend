@@ -1,6 +1,7 @@
 const express = require("express");
 const fs = require("fs")
 const path = require("path");
+const DockerRoute = new (require("../docker/docker"));
 
 class APIHandler {
     constructor(mongo, auth) {
@@ -47,10 +48,34 @@ class APIHandler {
             
             await this.mongo.update("users", {username: username}, { $push: { projects: { name: name, type: type, id: id } } });
         
-            fs.mkdirSync(path.join(__dirname, '..', 'data', username, id));    
+            fs.mkdirSync(path.join(__dirname, '..', 'data', username, id));   
+            
+            switch(type) {
+                case "static":
+                    fs.writeFileSync(path.join(__dirname, '..', 'data', username, id, 'index.html'), `<html>\n<head>\n<title>Template file</title>\n</head>\n<body>\n<p>Hello, this is a template file.</p>\n</body>\n</html>`)
+                    break;
+                case "nodejs":
+                    console.log("MAKING NODEJS " + name)
+                    fs.writeFileSync(path.join(__dirname, '..', 'data', username, id, 'index.js'), `console.log("Hello world")`)
+                    fs.writeFileSync(path.join(__dirname, '..', 'data', username, id, 'package.json'), `{
+    "name": "${name.toLowerCase().replace(/\s/gm, "-")}",
+    "description": "",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+      "test": "echo \\"Error: no test specified\\" && exit 1"
+    },
+    "keywords": [],
+    "author": "${username}",
+    "license": "ISC"
+}`)
+                    break;
+            }
 
             res.json({inserted: true, id: id})
         });
+
+        DockerRoute.registerRoutes(app, this.auth);
     }
 }
 

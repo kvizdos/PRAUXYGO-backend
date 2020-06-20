@@ -18,6 +18,7 @@ jobs:
         node-version: [10.x, 12.x, 14.x]
 
     steps:
+    - run: docker build docker/ --file docker/Dockerfile --tag prauxygo-nodejs
     - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1

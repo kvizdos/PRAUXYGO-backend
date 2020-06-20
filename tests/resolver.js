@@ -9,7 +9,7 @@ module.exports.tests = (request, injectedJS) => {
                                  .set('Host', global.secondprojectid + ".go.prauxy.app");
 
         const res2 = await request.post("/prauxyapi/new/file")
-                                 .send({file: "index.html"})
+                                 .send({file: "index2.html"})
                                  .set("Authorization", "Bearer testfreeuser:" + global.authtoken2)
                                  .set('Host', global.secondprojectid + ".go.prauxy.app");
 
@@ -247,7 +247,7 @@ module.exports.tests = (request, injectedJS) => {
                                  .set('Host', global.secondprojectid + ".go.prauxy.app");
 
         const res2 = await request.post("/prauxyapi/update")
-                                 .send({file: "index.html", contents: "<html>\n<head>\n<title>Hello World</title>\n</head>\n<body>\n<p>Hello World</p>\n</body></html>"})
+                                 .send({file: "index2.html", contents: "<html>\n<head>\n<title>Hello World</title>\n</head>\n<body>\n<p>Hello World</p>\n</body></html>"})
                                  .set("Authorization", "Bearer testfreeuser:" + global.authtoken2)
                                  .set('Host', global.secondprojectid + ".go.prauxy.app");
 
@@ -278,7 +278,7 @@ module.exports.tests = (request, injectedJS) => {
                                  .set('Host', global.secondprojectid + ".go.prauxy.app");
 
         expect(res.status).toBe(200);
-        expect(res.body).toHaveLength(6);
+        expect(res.body).toHaveLength(7);
 
         done();
     })
@@ -298,7 +298,7 @@ module.exports.tests = (request, injectedJS) => {
                                  .set('Host', global.secondprojectid + ".go.prauxy.app");
 
         expect(res.status).toBe(200);
-        expect(res.text).toBe(`<html><head>${injectedJS}\n<title>Hello World</title>\n</head>\n<body>\n<p>Hello World</p>\n</body></html>`);
+        expect(res.text).toBe(`<html><head>${injectedJS}\n<title>Template file</title>\n</head>\n<body>\n<p>Hello, this is a template file.</p>\n\n</body></html>`);
 
         done();
     })
