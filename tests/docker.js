@@ -1,6 +1,6 @@
 const { dockerExists } = require('../helpers/docker')
 
-module.exports.tests = (request) => {
+module.exports.tests = (request, socketService) => {
     test("it should fail with a bad app ID", async (done) => {
         const res = await request.post("/docker/new")
                                  .send({type: "blah"})
@@ -52,6 +52,14 @@ module.exports.tests = (request) => {
         expect(res.body.status).toBe("complete");
 
         expect(dockerExists('testuser')).toBe(true);
+
+        done();
+    })
+
+    test("it should return the docker logs", async (done) => {
+        expect(dockerExists('testuser')).toBe(true);
+
+
 
         done();
     })

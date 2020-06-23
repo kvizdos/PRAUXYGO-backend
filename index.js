@@ -1,11 +1,17 @@
 // Install body-parser and Express
 const express = require('express')
 const app = express()
-const fs = require('fs')
-const cheerio = require('cheerio')
+
+const wsMock = require('socket.io-mock');
+
+const socketServer = require("./sockets/SocketService");
+const socketService = (new socketServer(process.env.NODE_ENV == "test" ? new wsMock() : undefined)).start();
+
 const Authenticator = require('./authentication/authentication').Authenticator;
+
 const APIHandler = require('./api/apihandler').APIHandler;
 const AppResolver = require('./api/appresolver').AppResolver;
+
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -37,4 +43,5 @@ if(process.env.NODE_ENV != "test") {
     module.exports.authServer = authServer;
     module.exports.apiServer = apiServer,
     module.exports.arServer = arServer;
+    module.exports.socketService = socketService;
 }

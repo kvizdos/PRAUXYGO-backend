@@ -26,4 +26,4 @@ afterAll(() => {
 describe("Authorization Tests", () => auth.tests(request))
 describe("API Tests", () => api.tests(request))
 describe("App Resolver Tests", () => resolver.tests(request, app.arServer.getInjectedJs()))
-describe("Docker Tests", () => docker.tests(request))
+describe("Docker Tests", () => docker.tests(request, app.socketService))

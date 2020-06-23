@@ -8,7 +8,6 @@ class Docker {
     }
 
     async createDocker(username, app, type) {
-        console.log(`PRAUXYGO DATA DIR: ${this.dataDir}/${username}/${app}`)
         const cmd = `docker run --name=${username}-prauxygo -t -d -v ${this.dataDir}/${username}/${app}:/app prauxygo-${type}`;
         const cmdResult = execSync(cmd).toString();
         return cmdResult;
