@@ -56,11 +56,15 @@ module.exports.tests = (request, socketService) => {
         done();
     })
 
-    test("it should return the docker logs", async (done) => {
-        expect(dockerExists('testuser')).toBe(true);
+    // test("it should return the docker logs", async (done) => {
+    //     expect(dockerExists('testuser')).toBe(true);
 
+    //     socketService.on('message', (message) => {
+    //         expect(message).toBe(true);
+    //     })
 
+    //     socketService.
 
-        done();
-    })
+    //     done();
+    // })
 }
