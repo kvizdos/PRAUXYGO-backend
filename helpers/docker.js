@@ -1,4 +1,4 @@
-const { execSync } = require("child_process");
+const { execSync, exec } = require("child_process");
 
 const matchDocker = (username) => {
     return new RegExp(`Up.+?${username}-prauxygo`, "g");
@@ -15,6 +15,22 @@ const killAll = () => {
     const nodeKillRes = execSync(rmAllNode);
 }
 
+const getLogs = async (username) => {
+    
+    return new Promise((resolve, reject) => {
+        exec(`docker logs ${username}-prauxygo`, (error, stdout, stderr) => {
+            if(error) {
+                console.log("ERROR");
+                // console.log()
+                reject(stderr);
+            } 
+
+            resolve(stdout);
+        })
+    });
+}
+
 module.exports.matchDocker = matchDocker;
 module.exports.dockerExists = exists;
 module.exports.killAll = killAll;
+module.exports.getLogs = getLogs;

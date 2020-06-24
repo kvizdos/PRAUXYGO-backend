@@ -1,6 +1,21 @@
 const { dockerExists } = require('../helpers/docker')
+const io = require('socket.io-client')
 
-module.exports.tests = (request, socketService) => {
+module.exports.tests = (request, socketService, httpServerAddr) => {
+    let socket;
+    beforeAll(async (done) => {
+        console.log(httpServerAddr)
+        socket = io.connect(`http://localhost:8080`, {
+            'reconnection delay': 0,
+            'reopen delay': 0,
+            'force new connection': true,
+            transports: ['websocket'],
+        });
+        socket.on('connect', () => {
+            done();
+        });
+    })
+
     test("it should fail with a bad app ID", async (done) => {
         const res = await request.post("/docker/new")
                                  .send({type: "blah"})
@@ -56,15 +71,29 @@ module.exports.tests = (request, socketService) => {
         done();
     })
 
-    // test("it should return the docker logs", async (done) => {
-    //     expect(dockerExists('testuser')).toBe(true);
+    test("it should fail to join an invalid terminal", async (done) => {
+        socket.emit("join terminal", "baduser", async (data) => {
+            expect(data.trim()).toBe("Error: No such container: baduser-prauxygo");
+            done();
+        })       
+    })
 
-    //     socketService.on('message', (message) => {
-    //         expect(message).toBe(true);
-    //     })
+    test("it should connect to a terminal group and return directory contents", async (done) => {
+        socket.emit("join terminal", "testuser", async (data) => {
+            expect(data.trim()).toBe("index.js  package.json");
+            done();
+        })       
+    })
 
-    //     socketService.
+    test("it should return the docker start logs", async (done) => {
+        expect(dockerExists('testuser')).toBe(true);
 
-    //     done();
-    // })
+        socket.on("new logs", (data) => {
+            if(data.indexOf("Hello world") != -1) {
+                expect(data.indexOf("Hello world")).not.toBe(-1);
+                done();
+            }
+        })       
+
+    })
 }

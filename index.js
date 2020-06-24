@@ -1,12 +1,13 @@
 // Install body-parser and Express
-const express = require('express')
-const app = express()
+const app = require('express')();
+const http = require('http').createServer(app);
 
 const wsMock = require('socket.io-mock');
 
 const socketServer = require("./sockets/SocketService");
-const socketService = (new socketServer(process.env.NODE_ENV == "test" ? new wsMock() : undefined)).start();
-
+if(process.env.NODE_ENV != "test") {
+    var socketService = (new socketServer(http)).start();
+}
 const Authenticator = require('./authentication/authentication').Authenticator;
 
 const APIHandler = require('./api/apihandler').APIHandler;
