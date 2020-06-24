@@ -38,7 +38,7 @@ beforeAll(async (done) => {
 })
 
 afterAll(async (done) => {
-    killAll();
+    // killAll();
     rimraf.sync(path.join(__dirname, '..', 'data', 'testuser'));
     rimraf.sync(path.join(__dirname, '..', 'data', 'testfreeuser'));   
     

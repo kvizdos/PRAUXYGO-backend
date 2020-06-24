@@ -1,5 +1,5 @@
 const socketIO = require('socket.io');
-const { getLogs } = require('../helpers/docker');
+const Docker = require('../helpers/docker');
 const { spawn } = require('child_process');
 
 class SocketService {
@@ -10,7 +10,11 @@ class SocketService {
 
   start() {
     this.socketServer.on('connection', socket => {
-      console.log('connected')
+      socket.on('kill terminal', async (username, cb = () => {}) => {
+        socket.leave(username);
+        Docker.kill(username);
+        cb();
+      })
 
       socket.on('join terminal', async (username, cb) => {
         if(this.socketServer.sockets.adapter.rooms[username] == undefined) {
@@ -38,7 +42,7 @@ class SocketService {
         };
 
         try {
-          const currentLogs = await getLogs(username);
+          const currentLogs = await Docker.getLogs(username);
           socket.join(username)
         
           cb(currentLogs);
@@ -48,8 +52,9 @@ class SocketService {
         }
       })
 
-      socket.on("disconnecting", () => {
-        this.listeningToLogs[Object.keys(socket.rooms)[1]].kill('SIGKILL');
+      socket.on("disconnecting", async () => {
+        socket.leave(Object.keys(socket.rooms)[1]);
+        Docker.kill(Object.keys(socket.rooms)[1]);
         delete this.listeningToLogs[Object.keys(socket.rooms)[1]];
       })
 

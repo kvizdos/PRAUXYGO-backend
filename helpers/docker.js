@@ -15,13 +15,16 @@ const killAll = () => {
     const nodeKillRes = execSync(rmAllNode);
 }
 
+const kill = (username) => {
+    const rm = `docker rm $(docker kill ${username}-prauxygo)`
+    const nodeKillRes = execSync(rm);
+    console.log("resu: " + nodeKillRes)
+}
+
 const getLogs = async (username) => {
-    
     return new Promise((resolve, reject) => {
         exec(`docker logs ${username}-prauxygo`, (error, stdout, stderr) => {
             if(error) {
-                console.log("ERROR");
-                // console.log()
                 reject(stderr);
             } 
 
@@ -33,4 +36,5 @@ const getLogs = async (username) => {
 module.exports.matchDocker = matchDocker;
 module.exports.dockerExists = exists;
 module.exports.killAll = killAll;
+module.exports.kill = kill;
 module.exports.getLogs = getLogs;
