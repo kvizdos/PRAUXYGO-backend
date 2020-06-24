@@ -101,12 +101,12 @@ module.exports.tests = (request, socketService, httpServerAddr) => {
         })       
     })
 
-    // test("it should kill the docker container when they leave", async (done) => {
-    //     expect(dockerExists('testuser')).toBe(true);
+    test("it should kill the docker container when they leave", async (done) => {
+        expect(dockerExists('testuser')).toBe(true);
 
-    //     socket.emit("kill terminal", "testuser", () => {
-    //         expect(dockerExists('testuser')).toBe(false);
-    //         done();
-    //     });
-    // })
+        socket.emit("kill terminal", "testuser", () => {
+            expect(dockerExists('testuser')).toBe(false);
+            done();
+        });
+    })
 }
