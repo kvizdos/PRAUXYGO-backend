@@ -72,22 +72,31 @@ module.exports.tests = (request, socketService, httpServerAddr) => {
     })
 
     test("it should fail to join an invalid terminal", async (done) => {
+        expect(dockerExists('baduser')).toBe(false);
+
         socket.emit("join terminal", "baduser", async (data) => {
             expect(data.trim()).toBe("Error: No such container: baduser-prauxygo");
+            expect(dockerExists('baduser')).toBe(false);
             done();
         })       
     })
 
     test("it should connect to a terminal group and return directory contents", async (done) => {
+        expect(dockerExists('testuser')).toBe(true);
+
         socket.emit("join terminal", "testuser", async (data) => {
             expect(data).not.toBe(undefined);
+            expect(dockerExists('testuser')).toBe(true);
             done();
         })       
     })
 
     test("it should return the docker start logs", async (done) => {
+        expect(dockerExists('testuser')).toBe(true);
+
         socket.on("new logs", (data) => {
             expect(data).not.toBe(undefined);
+            expect(dockerExists('testuser')).toBe(true);
             done();
         })       
     })
