@@ -5,9 +5,16 @@ const matchDocker = (username) => {
 }
 
 const exists = (username) => {
-    const getDockerStatus = execSync(`docker ps -a | grep '${username}-prauxygo' | grep -v grep | cat`).toString();
-    const matches = matchDocker(username).test(getDockerStatus);
-    return matches;
+    return new Promise((resolve, reject) => {
+        exec(`docker ps -a | grep '${username}-prauxygo' | grep -v grep | cat`, (error, stdout, stderr) => {
+            if(error) {
+                console.log("ERRRROROOROROROR: " + stderr);
+                return reject(false);
+            };
+
+            resolve(matchDocker(username).test(stdout));
+        })
+    })
 }
 
 const killAll = () => {
@@ -18,14 +25,13 @@ const killAll = () => {
 const kill = (username) => {
     const rm = `docker rm $(docker kill ${username}-prauxygo)`
     const nodeKillRes = execSync(rm);
-    console.log("resu: " + nodeKillRes)
 }
 
 const getLogs = async (username) => {
     return new Promise((resolve, reject) => {
         exec(`docker logs ${username}-prauxygo`, (error, stdout, stderr) => {
             if(error) {
-                reject(stderr);
+                return reject(stderr);
             } 
 
             resolve(stdout);

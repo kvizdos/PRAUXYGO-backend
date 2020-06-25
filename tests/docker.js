@@ -40,7 +40,8 @@ module.exports.tests = (request, socketService, httpServerAddr) => {
     })
 
     test("it should create a new nodejs container for a user", async (done) => {
-        expect(dockerExists('testuser')).toBe(false);
+        const dockerExistsBefore = await dockerExists('testuser');
+        expect(dockerExistsBefore).toBe(false);
 
         const res = await request.post("/docker/new")
                                  .send({type: "nodejs", app: global.newprojectid})
@@ -50,13 +51,15 @@ module.exports.tests = (request, socketService, httpServerAddr) => {
         expect(res.status).toBe(200);
         expect(res.body.status).toBe("complete");
 
-        expect(dockerExists('testuser')).toBe(true);
+        const dockerExistsAfter = await dockerExists('testuser');
+        expect(dockerExistsAfter).toBe(true);
 
         done();
     })
 
     test("it should restart a docker if a user already has one running", async (done) => {
-        expect(dockerExists('testuser')).toBe(true);
+        const dockerExistsBefore = await dockerExists('testuser');
+        expect(dockerExistsBefore).toBe(true);
 
         const res = await request.post("/docker/new")
                                  .send({type: "nodejs", app: global.newprojectid})
@@ -66,46 +69,54 @@ module.exports.tests = (request, socketService, httpServerAddr) => {
         expect(res.status).toBe(200);
         expect(res.body.status).toBe("complete");
 
-        expect(dockerExists('testuser')).toBe(true);
+        const dockerExistsAfter = await dockerExists('testuser');
+        expect(dockerExistsAfter).toBe(true);
 
         done();
     })
 
     test("it should fail to join an invalid terminal", async (done) => {
-        expect(dockerExists('baduser')).toBe(false);
+        const dockerExistsBefore = await dockerExists('baduser');
+        expect(dockerExistsBefore).toBe(false);
+
 
         socket.emit("join terminal", "baduser", async (data) => {
             expect(data.trim()).toBe("Error: No such container: baduser-prauxygo");
-            expect(dockerExists('baduser')).toBe(false);
+
+            const dockerExistsAfter = await dockerExists('baduser');
+            expect(dockerExistsAfter).toBe(false);
             done();
         })       
     })
 
     test("it should connect to a terminal group and return directory contents", async (done) => {
-        expect(dockerExists('testuser')).toBe(true);
+        const dockerExistsBefore = await dockerExists('testuser');
+        expect(dockerExistsBefore).toBe(true);
+
 
         socket.emit("join terminal", "testuser", async (data) => {
-            expect(data).not.toBe(undefined);
-            expect(dockerExists('testuser')).toBe(true);
-            done();
-        })       
-    })
+            const dockerExistsAfter = await dockerExists('testuser');
+            expect(dockerExistsAfter).toBe(true);
 
-    test("it should return the docker start logs", async (done) => {
-        expect(dockerExists('testuser')).toBe(true);
-
-        socket.on("new logs", (data) => {
             expect(data).not.toBe(undefined);
-            expect(dockerExists('testuser')).toBe(true);
-            done();
+
+            socket.on("new logs", async (data) => {
+                expect(data).not.toBe(undefined);
+
+                const dockerExistsAfter = await dockerExists('testuser');
+                expect(dockerExistsAfter).toBe(true);
+                done();
+            })       
         })       
     })
 
     test("it should kill the docker container when they leave", async (done) => {
-        expect(dockerExists('testuser')).toBe(true);
+        const dockerExistsBefore = await dockerExists('testuser');
+        expect(dockerExistsBefore).toBe(true);
 
-        socket.emit("kill terminal", "testuser", () => {
-            expect(dockerExists('testuser')).toBe(false);
+        socket.emit("kill terminal", "testuser", async () => {
+            const dockerExistsAfter = await dockerExists('testuser');
+            expect(dockerExistsAfter).toBe(false);
             done();
         });
     })

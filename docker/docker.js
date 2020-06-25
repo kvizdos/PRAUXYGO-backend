@@ -21,7 +21,7 @@ class Docker {
 
             if(app == undefined) return res.status(400).json({status: "fail", reason: "invalid app name"});
             if(this.enabledTypes.indexOf(type) == -1) return res.status(400).json({status: "fail", reason: "invalid type"})
-            if(dockerExists(username)) execSync(`docker kill ${username}-prauxygo && docker rm ${username}-prauxygo`);
+            if(await dockerExists(username)) execSync(`docker kill ${username}-prauxygo && docker rm ${username}-prauxygo`);
 
             const result = await this.createDocker(username, app, type);
 
