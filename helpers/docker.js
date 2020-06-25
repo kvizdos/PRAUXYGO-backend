@@ -8,7 +8,7 @@ const exists = (username) => {
     return new Promise((resolve, reject) => {
         exec(`docker ps -a | grep '${username}-prauxygo' | grep -v grep | cat`, (error, stdout, stderr) => {
             if(error) {
-                console.log("ERRRROROOROROROR: " + stderr);
+                console.log("ERROR EXISTING: " + stderr);
                 return reject(false);
             };
 
@@ -23,8 +23,16 @@ const killAll = () => {
 }
 
 const kill = (username) => {
-    const rm = `docker rm $(docker kill ${username}-prauxygo)`
-    const nodeKillRes = execSync(rm);
+    return new Promise((resolve, reject) => {
+        exec(`docker rm $(docker kill ${username}-prauxygo)`, (error, stdout, stderr) => {
+            if(error) {
+                console.log("ERROR KILLING: " + stderr);
+                return reject(false);
+            };
+
+            resolve(true);
+        })
+    })
 }
 
 const getLogs = async (username) => {

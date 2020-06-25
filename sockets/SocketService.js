@@ -12,8 +12,9 @@ class SocketService {
     this.socketServer.on('connection', socket => {
       socket.on('kill terminal', async (username, cb = () => {}) => {
         socket.leave(username);
-        Docker.kill(username);
-        cb();
+        Docker.kill(username).then(() => {
+          cb();
+        });
       })
 
       socket.on('join terminal', async (username, cb) => {
@@ -54,8 +55,11 @@ class SocketService {
 
       socket.on("disconnecting", async () => {
         socket.leave(Object.keys(socket.rooms)[1]);
-        Docker.kill(Object.keys(socket.rooms)[1]);
-        delete this.listeningToLogs[Object.keys(socket.rooms)[1]];
+        Docker.kill(username).then(() => {
+          delete this.listeningToLogs[Object.keys(socket.rooms)[1]];
+
+          cb();
+        });
       })
 
       socket.on('disconnect', () => {

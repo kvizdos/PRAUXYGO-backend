@@ -1,5 +1,5 @@
-const { matchDocker, dockerExists } = require('../helpers/docker');
-const { execSync } = require("child_process");
+const { matchDocker, dockerExists, kill } = require('../helpers/docker');
+const { exec } = require("child_process");
 
 class Docker {
     constructor(dataDir = "/home/kvizdos/PrauxyGO/PRAUXYGO-backend/data") {
@@ -8,9 +8,16 @@ class Docker {
     }
 
     async createDocker(username, app, type) {
-        const cmd = `docker run --name=${username}-prauxygo -t -d -v ${this.dataDir}/${username}/${app}:/app prauxygo-${type}`;
-        const cmdResult = execSync(cmd).toString();
-        return cmdResult;
+        return new Promise((resolve, reject) => {
+            exec(`docker run --name=${username}-prauxygo -t -d -v ${this.dataDir}/${username}/${app}:/app prauxygo-${type}`, (error, stdout, stderr) => {
+                if(error) {
+                    console.log("ERROR CREATING DOCKER: " + stderr);
+                    return reject(stderr);
+                };
+    
+                resolve(stdout);
+            })
+        })
     }
 
     registerRoutes(app, auth) {
@@ -21,7 +28,8 @@ class Docker {
 
             if(app == undefined) return res.status(400).json({status: "fail", reason: "invalid app name"});
             if(this.enabledTypes.indexOf(type) == -1) return res.status(400).json({status: "fail", reason: "invalid type"})
-            if(await dockerExists(username)) execSync(`docker kill ${username}-prauxygo && docker rm ${username}-prauxygo`);
+            // if(await dockerExists(username)) execSync(`docker kill ${username}-prauxygo && docker rm ${username}-prauxygo`);
+            if(await dockerExists(username)) await kill(username);
 
             const result = await this.createDocker(username, app, type);
 
