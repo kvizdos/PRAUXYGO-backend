@@ -89,19 +89,22 @@ module.exports.tests = (request, socketService, httpServerAddr) => {
         })       
     })
 
-    test("it should connect to a terminal group and return directory contents", async (done) => {
+    test("it should connect to a terminal group and return initial line plus extra new logs", async (done) => {
         const dockerExistsBefore = await dockerExists('testuser');
         expect(dockerExistsBefore).toBe(true);
 
 
         socket.emit("join terminal", "testuser", async (data) => {
-            const dockerExistsAfter = await dockerExists('testuser');
-            expect(dockerExistsAfter).toBe(true);
+            const dockerExistsBefore = await dockerExists('testuser');
+            expect(dockerExistsBefore).toBe(true);
 
             expect(data).not.toBe(undefined);
+            console.log("DATAA: " + data);
 
             socket.on("new logs", async (data) => {
                 expect(data).not.toBe(undefined);
+
+                console.log("DATAAAAAA: " + data);
 
                 const dockerExistsAfter = await dockerExists('testuser');
                 expect(dockerExistsAfter).toBe(true);
