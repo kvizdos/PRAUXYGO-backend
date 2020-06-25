@@ -53,11 +53,12 @@ class APIHandler {
             switch(type) {
                 case "static":
                     fs.writeFileSync(path.join(__dirname, '..', 'data', username, id, 'index.html'), `<html>\n<head>\n<title>Template file</title>\n</head>\n<body>\n<p>Hello, this is a template file.</p>\n</body>\n</html>`)
+                    res.json({inserted: true, id: id})
                     break;
                 case "nodejs":
                     console.log("MAKING NODEJS " + name)
-                    fs.writeFileSync(path.join(__dirname, '..', 'data', username, id, 'index.js'), `console.log("Hello world")`)
-                    fs.writeFileSync(path.join(__dirname, '..', 'data', username, id, 'package.json'), `{
+                    fs.writeFile(path.join(__dirname, '..', 'data', username, id, 'index.js'), `console.log("Hello world")`, () => {
+                        fs.writeFile(path.join(__dirname, '..', 'data', username, id, 'package.json'), `{
     "name": "${name.toLowerCase().replace(/\s/gm, "-")}",
     "description": "",
     "version": "1.0.0",
@@ -68,11 +69,14 @@ class APIHandler {
     "keywords": [],
     "author": "${username}",
     "license": "ISC"
-}`)
+}`, () => {
+    res.json({inserted: true, id: id})
+})
+
+                    })
                     break;
             }
 
-            res.json({inserted: true, id: id})
         });
 
         DockerRoute.registerRoutes(app, this.auth);
