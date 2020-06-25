@@ -1,6 +1,7 @@
 const { dockerExists } = require('../helpers/docker')
 const io = require('socket.io-client')
-
+const fs = require('fs');
+const path = require('path')
 module.exports.tests = (request, socketService, httpServerAddr) => {
     let socket;
     beforeAll(async (done) => {
@@ -69,6 +70,12 @@ module.exports.tests = (request, socketService, httpServerAddr) => {
         expect(res.status).toBe(200);
         expect(res.body.status).toBe("complete");
 
+        const nodeTemplateCreatedIndex = fs.existsSync(path.join(__dirname, '..', 'data', 'testuser', global.newprojectid, 'index.js'));
+        const nodeTemplateCreatedPackage = fs.existsSync(path.join(__dirname, '..', 'data', 'testuser', global.newprojectid, 'package.json'));        
+
+        expect(nodeTemplateCreatedIndex).toBe(true);
+        expect(nodeTemplateCreatedPackage).toBe(true);
+
         const dockerExistsAfter = await dockerExists('testuser');
         expect(dockerExistsAfter).toBe(true);
 
@@ -90,6 +97,12 @@ module.exports.tests = (request, socketService, httpServerAddr) => {
     })
 
     test("it should connect to a terminal group and return initial line plus extra new logs", async (done) => {
+        const nodeTemplateCreatedIndex = fs.existsSync(path.join(__dirname, '..', 'data', 'testuser', global.newprojectid, 'index.js'));
+        const nodeTemplateCreatedPackage = fs.existsSync(path.join(__dirname, '..', 'data', 'testuser', global.newprojectid, 'package.json'));        
+
+        expect(nodeTemplateCreatedIndex).toBe(true);
+        expect(nodeTemplateCreatedPackage).toBe(true);
+
         const dockerExistsBefore = await dockerExists('testuser');
         expect(dockerExistsBefore).toBe(true);
 
@@ -114,6 +127,12 @@ module.exports.tests = (request, socketService, httpServerAddr) => {
     })
 
     test("it should kill the docker container when they leave", async (done) => {
+        const nodeTemplateCreatedIndex = fs.existsSync(path.join(__dirname, '..', 'data', 'testuser', global.newprojectid, 'index.js'));
+        const nodeTemplateCreatedPackage = fs.existsSync(path.join(__dirname, '..', 'data', 'testuser', global.newprojectid, 'package.json'));        
+
+        expect(nodeTemplateCreatedIndex).toBe(true);
+        expect(nodeTemplateCreatedPackage).toBe(true);
+
         const dockerExistsBefore = await dockerExists('testuser');
         expect(dockerExistsBefore).toBe(true);
 
