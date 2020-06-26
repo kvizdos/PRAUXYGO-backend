@@ -3,11 +3,21 @@ const Docker = require('../helpers/docker');
 const { spawn } = require('child_process');
 
 class SocketService {
+  /**
+   * Creates a socket server that will listen for specified endpoints.
+   * 
+   * @constructor
+   * @param {socketIO} server 
+   */
   constructor(server) {
     this.socketServer = require('socket.io')(server);
     this.listeningToLogs = {};
   }
 
+  /**
+   * Starts listening for specified endpoints
+   * @returns {void}
+   */
   start() {
     this.socketServer.on('connection', socket => {
       socket.on('kill terminal', async (username, cb = () => {}) => {

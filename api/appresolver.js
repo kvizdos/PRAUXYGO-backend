@@ -11,26 +11,27 @@ const nameOpts = "agreeable loaf tent flowery grandfather heap ear deranged deaf
 const skipFileTypes = "exe, webm, mkv, flv, vob, ogv, ogg, drc, gif, gifv, mng, avi, mts, m2ts, mov, qt, wmv, yub, rm, rmvb, asf, amv, mp4, m4p, m4v, mpg, mp2, mpeg, mpe, mpv, m2v, m4v, svi, 3gp, 3g2, mxf, roq, nsv, flv, f4v, f4p, f4a, f4b, ani, anim, apng, art, bmp, bpg, bsave, cal, cin, cpc, cpt, dds, dpx, ecw, exr, fits, flic, flif, fpx, gif, hdri, hevc, icer, icns, ico, cur, ics, ilbm, jbig, jbig2, jpeg, jpeg2000, jpegxr, xpegxt, jpegxl, xra, kra, mng, miff, nrrd, pam, pbm, pgm, ppm, pnm, pcx, pgf, pictor, png, psd, psb, psp, qtvr, ras, rgbe, sgi, tga, tiff, ufo, ufp, wbmp, webp, xbm, xcf, xpm, xwd, ciff, dng, ai, cdr, cgm, dxf, eva, emf, gerber, hvif, iges, pgml, svg, vml, wmf, xar, cdf, djvu, eps, pdf, pict, ps, swf, xaml"
 
 class AppResolver {
+    /**
+     * Creates resolver class to help out with resolving user apps
+     * 
+     * @constructor
+     * @param {*} mongo - Mongo helper class 
+     * @param {*} auth - Authentication helper class
+     */
     constructor(mongo, auth) {
         this.mongo = mongo;
         this.auth = auth;
         this.router = express.Router();
         this.registerRoutes(this.router)
     }
-    
-    async generateUniqueID(id = this.auth.createToken(3, nameOpts, "-"), depth = 0) {
-        if(depth == 3) return;
-        depth++;
-    
-        const found = await this.mongo.find("users", { projects: { $elemMatch: { id: id } }});
-    
-        if(found.length == 0) {
-            return id;
-        } else {
-            return await generateUniqueID(authServer.createToken(3, nameOpts, "-"))
-        }
-    }
 
+    /**
+     * Recursively read a directory for all of its files and folders
+     * 
+     * @param {string} directory - Initial directory to read
+     * @param {string} path - Keeps track of where it is recursively
+     * @returns {Object} - Sorted object (folders then files) with all found items.
+     */
     readDir(directory, path = "") {
         const files = fs.readdirSync(directory).map(i => {
             return {
@@ -48,12 +49,28 @@ class AppResolver {
         return files;
     }
 
+    /**
+     * Gets the routes routes
+     * 
+     * @returns {express.Router()} - All routes
+     */
     getRoutes() { return this.router }
 
+    /**
+     * Gets the injected JavaScript used in app webview
+     * 
+     * @returns {string} - JavaScript
+     */
     getInjectedJs() {
         return INJECTEDJAVASCRIPT;
     }
     
+    /**
+     * Registers required resolver routes
+     * 
+     * @param {*} app - Express app 
+     * @returns {void}
+     */
     registerRoutes(app) {
         app.get("/prauxyapi", this.auth.canViewApp("manage"), async (req, res) => {
             const app = req.hostname.split(".")[0];

@@ -4,6 +4,13 @@ const path = require("path");
 const DockerRoute = new (require("../docker/docker"));
 
 class APIHandler {
+    /**
+     * Creates generic API backend used for project creation and such
+     * 
+     * @constructor
+     * @param {*} mongo - Mongo Helper 
+     * @param {*} auth - Authentication helper
+     */
     constructor(mongo, auth) {
         this.mongo = mongo;
         this.auth = auth;
@@ -13,6 +20,14 @@ class APIHandler {
 
     }
     
+    /**
+     * Recursively generates a unique App ID
+     * 
+     * @async
+     * @param {string} id - Do not specify
+     * @param {number} depth - Do not specify
+     * @returns {string} - a valid and unique App ID
+     */
     async generateUniqueID(id = this.auth.createToken(3, this.nameOpts, "-"), depth = 0) {
         if(depth == 3) return;
         depth++;
@@ -26,8 +41,20 @@ class APIHandler {
         }
     }
 
+
+    /**
+     * Returns all routes
+     * 
+     * @returns {express.Router()} - Express routes
+     */
     getRoutes() { return this.router }
 
+    /**
+     * Registers required API routes
+     * 
+     * @param {*} app - Express app 
+     * @returns {void}
+     */
     registerRoutes(app) {
         app.get("/", (req, res) => {
             res.json({done: true})

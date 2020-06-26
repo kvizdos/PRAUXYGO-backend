@@ -6,6 +6,12 @@ const fs = require('fs');
 const path = require('path');
 
 class Authenticator {
+    /**
+     * Creates authentication systems (routes, middleware, extra functions)
+     * 
+     * @constructor
+     * @param {*} mongo - Mongo Helper class
+     */
     constructor(mongo) {
         this.mongo = mongo;
         this.routes = express.Router();
@@ -13,13 +19,33 @@ class Authenticator {
         this.roles = new Roles.Roles();
     }
 
+    /**
+     * Returns all routes
+     * 
+     * @returns {express.Router()} - Express routes
+     */
     getRoutes() { return this.routes }
 
-    createToken(length = 180, arr, delim = "") {
+    /**
+     * Generates a secure random token used for authorization
+     * 
+     * @param {number} [length=180] - Length of token (default 180) 
+     * @param {(string|string[])} arr - Specify the array to use for character choices
+     * @param {string} delim - How to join characters 
+     * @returns {string} - Random secure string
+     */
+    createToken(length = 180, arr = undefined, delim = "") {
         const options = arr == undefined ? "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-=!@#$%^^&*()_+,.<>?[]" : arr;
         return [...new Array(length)].map(i => options[Math.floor(Math.random() * options.length)]).join(delim);
     }
 
+    /**
+     * Parses HTTP request and verifies a users token is valid
+     * 
+     * @async
+     * @param {*} req - HTTP express request to be parsed 
+     * @returns {boolean} - Specifies whether or not a request is valid
+     */
     async verifyToken(req) {
         if(!/Bearer\s((.{1,})\:(.{180}))/.test(req.get("authorization"))) return {status: "fail", reason: "invalid authorization header"}
 
@@ -35,6 +61,13 @@ class Authenticator {
         return isValidHeader;
     }
 
+    /**
+     * Confirms a user has a specified feature flag.
+     * 
+     * @param {string} flag - Permission flag to check 
+     * @param {*=} matches - Checks if permission flag is equal to something
+     * @returns {void} 
+     */
     hasFeatureFlag(flag, matches) {
         return async (req, res, next) => {
             const isValidToken = await this.verifyToken(req);
@@ -56,6 +89,11 @@ class Authenticator {
         }
     }
 
+    /**
+     * Confirms a user has access to an app
+     * 
+     * @returns {void}
+     */
     canViewApp() {
         return async (req, res, next) => {
             const isValidToken = await this.verifyToken(req);
@@ -73,6 +111,12 @@ class Authenticator {
         }
     }
 
+    /**
+     * Registers required authentication routes
+     * 
+     * @param {*} app - Express app 
+     * @returns {void}
+     */
     registerRoutes(app) {
         app.get("/", (req, res) => {
             res.json({status: "up"})
