@@ -25,9 +25,12 @@ class SocketService {
         Docker.kill(username).then(() => {
           cb();
         });
-      })
-
+	  })
+	    
       socket.on('join terminal', async (username, cb) => {
+		  const isValidUsername = await Docker.dockerExists(username);
+		  if(!isValidUsername) return cb("invalid username");
+
         if(this.socketServer.sockets.adapter.rooms[username] == undefined) {
           const newProc = spawn('sh', [ "-c", `watch "docker logs ${username}-prauxygo"` ]);
           newProc.stdout.setEncoding('utf-8');

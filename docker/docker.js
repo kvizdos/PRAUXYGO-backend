@@ -38,8 +38,8 @@ class Docker {
     /**
      * Generates routes for Docker endpoints
      * 
-     * @param {import('express')()} app - Express app to listen on
-     * @param {import('../authentication/authentication')} auth - Authentication service for middleware
+     * @param {*} app - Express app to listen on
+     * @param {*} auth - Authentication service for middleware
      */
     registerRoutes(app, auth) {
         app.post("/docker/new", auth.hasFeatureFlag("terminal"), async (req, res) => {
@@ -49,7 +49,7 @@ class Docker {
 
             if(app == undefined) return res.status(400).json({status: "fail", reason: "invalid app name"});
             if(this.enabledTypes.indexOf(type) == -1) return res.status(400).json({status: "fail", reason: "invalid type"})
-            // if(await dockerExists(username)) execSync(`docker kill ${username}-prauxygo && docker rm ${username}-prauxygo`);
+
             const dockerAlreadyExists = await dockerExists(username);
             if(dockerAlreadyExists) await kill(username);
 

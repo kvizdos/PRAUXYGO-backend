@@ -88,7 +88,7 @@ module.exports.tests = (request, socketService, httpServerAddr) => {
 
 
         socket.emit("join terminal", "baduser", async (data) => {
-            expect(data.trim()).toBe("Error: No such container: baduser-prauxygo");
+            expect(data.trim()).toBe("invalid username");
 
             const dockerExistsAfter = await dockerExists('baduser');
             expect(dockerExistsAfter).toBe(false);
