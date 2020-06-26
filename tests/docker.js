@@ -41,6 +41,12 @@ module.exports.tests = (request, socketService, httpServerAddr) => {
     })
 
     test("it should create a new nodejs container for a user", async (done) => {
+        const nodeTemplateCreatedIndex = fs.existsSync(path.join(__dirname, '..', 'data', 'testuser', global.newprojectid, 'index.js'));
+        const nodeTemplateCreatedPackage = fs.existsSync(path.join(__dirname, '..', 'data', 'testuser', global.newprojectid, 'package.json'));   
+
+        expect(nodeTemplateCreatedIndex).toBe(true);
+        expect(nodeTemplateCreatedPackage).toBe(true);
+
         const dockerExistsBefore = await dockerExists('testuser');
         expect(dockerExistsBefore).toBe(false);
 
