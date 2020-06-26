@@ -61,12 +61,16 @@ module.exports.tests = (request, socketService, httpServerAddr) => {
         const dockerExistsAfter = await dockerExists('testuser');
         expect(dockerExistsAfter).toBe(true);
 
-        setTimeout(function() {
-            done();
-        }, 1000)
+        done();
     })
 
     test("it should restart a docker if a user already has one running", async (done) => {
+        const nodeTemplateCreatedIndex = fs.existsSync(path.join(__dirname, '..', 'data', 'testuser', global.newprojectid, 'index.js'));
+        const nodeTemplateCreatedPackage = fs.existsSync(path.join(__dirname, '..', 'data', 'testuser', global.newprojectid, 'package.json'));        
+
+        expect(nodeTemplateCreatedIndex).toBe(true);
+        expect(nodeTemplateCreatedPackage).toBe(true);
+
         const dockerExistsBefore = await dockerExists('testuser');
         expect(dockerExistsBefore).toBe(true);
 
@@ -78,19 +82,10 @@ module.exports.tests = (request, socketService, httpServerAddr) => {
         expect(res.status).toBe(200);
         expect(res.body.status).toBe("complete");
 
-        const nodeTemplateCreatedIndex = fs.existsSync(path.join(__dirname, '..', 'data', 'testuser', global.newprojectid, 'index.js'));
-        const nodeTemplateCreatedPackage = fs.existsSync(path.join(__dirname, '..', 'data', 'testuser', global.newprojectid, 'package.json'));        
-
-        expect(nodeTemplateCreatedIndex).toBe(true);
-        expect(nodeTemplateCreatedPackage).toBe(true);
-
         const dockerExistsAfter = await dockerExists('testuser');
         expect(dockerExistsAfter).toBe(true);
 
-
-        setTimeout(function() {
-            done();
-        }, 1000)
+        done();
     })
 
     test("it should fail to join an invalid terminal", async (done) => {

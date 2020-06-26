@@ -6,9 +6,9 @@ class Docker {
      * This class aides in the creation of route registration and other subtasks of Docker which are not specified in ../helpers/docker.js
      * 
      * @constructor
-     * @param {string} [dataDir = "/home/kvizdos/PrauxyGO/PRAUXYGO-backend/data"] - Specifies the directory to look into for user data 
+     * @param {string} [dataDir = "{__dirname}/data"] - Specifies the directory to look into for user data 
      */
-    constructor(dataDir = "/home/kvizdos/PrauxyGO/PRAUXYGO-backend/data") {
+    constructor(dataDir = `${__dirname}/data`) {
         this.enabledTypes = ["nodejs"]
         this.dataDir = dataDir;
     }
