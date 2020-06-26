@@ -61,32 +61,37 @@ module.exports.tests = (request, socketService, httpServerAddr) => {
         const dockerExistsAfter = await dockerExists('testuser');
         expect(dockerExistsAfter).toBe(true);
 
-        done();
+        setTimeout(function() {
+            done();
+        }, 1000)
     })
 
-    // test("it should restart a docker if a user already has one running", async (done) => {
-    //     const dockerExistsBefore = await dockerExists('testuser');
-    //     expect(dockerExistsBefore).toBe(true);
+    test("it should restart a docker if a user already has one running", async (done) => {
+        const dockerExistsBefore = await dockerExists('testuser');
+        expect(dockerExistsBefore).toBe(true);
 
-    //     const res = await request.post("/docker/new")
-    //                              .send({type: "nodejs", app: global.newprojectid})
-    //                              .set("Authorization", "Bearer testuser:" + global.authtoken)
-    //                              .set('Host', "api.go.prauxy.app");
+        const res = await request.post("/docker/new")
+                                 .send({type: "nodejs", app: global.newprojectid})
+                                 .set("Authorization", "Bearer testuser:" + global.authtoken)
+                                 .set('Host', "api.go.prauxy.app");
 
-    //     expect(res.status).toBe(200);
-    //     expect(res.body.status).toBe("complete");
+        expect(res.status).toBe(200);
+        expect(res.body.status).toBe("complete");
 
-    //     const nodeTemplateCreatedIndex = fs.existsSync(path.join(__dirname, '..', 'data', 'testuser', global.newprojectid, 'index.js'));
-    //     const nodeTemplateCreatedPackage = fs.existsSync(path.join(__dirname, '..', 'data', 'testuser', global.newprojectid, 'package.json'));        
+        const nodeTemplateCreatedIndex = fs.existsSync(path.join(__dirname, '..', 'data', 'testuser', global.newprojectid, 'index.js'));
+        const nodeTemplateCreatedPackage = fs.existsSync(path.join(__dirname, '..', 'data', 'testuser', global.newprojectid, 'package.json'));        
 
-    //     expect(nodeTemplateCreatedIndex).toBe(true);
-    //     expect(nodeTemplateCreatedPackage).toBe(true);
+        expect(nodeTemplateCreatedIndex).toBe(true);
+        expect(nodeTemplateCreatedPackage).toBe(true);
 
-    //     const dockerExistsAfter = await dockerExists('testuser');
-    //     expect(dockerExistsAfter).toBe(true);
+        const dockerExistsAfter = await dockerExists('testuser');
+        expect(dockerExistsAfter).toBe(true);
 
-    //     done();
-    // })
+
+        setTimeout(function() {
+            done();
+        }, 1000)
+    })
 
     test("it should fail to join an invalid terminal", async (done) => {
         const dockerExistsBefore = await dockerExists('baduser');
