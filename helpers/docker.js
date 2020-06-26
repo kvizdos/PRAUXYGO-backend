@@ -53,7 +53,7 @@ const kill = async (username) => {
         exec(`docker rm $(docker kill ${username}-prauxygo)`, (error, stdout, stderr) => {
             if(error) {
                 console.log("ERROR KILLING: " + stderr);
-                return reject(false);
+                return reject(stderr);
             };
 
             resolve(true);
