@@ -137,9 +137,17 @@ module.exports.tests = (request, socketService, httpServerAddr) => {
         expect(dockerExistsBefore).toBe(true);
 
         socket.emit("kill terminal", "testuser", async () => {
-            const dockerExistsAfter = await dockerExists('testuser');
-            expect(dockerExistsAfter).toBe(false);
-            done();
+            try {
+                const dockerExistsAfter = await dockerExists('testuser');
+                expect(dockerExistsAfter).toBe(false);
+                done();
+            } catch(e) {
+                console.log("KILLING ERROR");
+                console.log(e);
+                console.log("END KILLING ERROR")
+                expect(true).toBe(false)
+                done();
+            }
         });
     })
 }
