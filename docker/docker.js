@@ -1,6 +1,7 @@
 const { matchDocker, dockerExists, kill } = require('../helpers/docker');
 const { exec } = require("child_process");
 const fs = require("fs")
+const path = require("path")
 
 class Docker {
     /**
@@ -9,7 +10,7 @@ class Docker {
      * @constructor
      * @param {string} [dataDir = "{__dirname}/data"] - Specifies the directory to look into for user data 
      */
-    constructor(dataDir = `${__dirname}/data`) {
+    constructor(dataDir = path.join(__dirname, "..", "data")) {
         console.log("READING DIRECTORY " + dataDir);
         console.log("DATA DIR EXISTS: " + fs.existsSync(dataDir))
         this.enabledTypes = ["nodejs"]
