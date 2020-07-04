@@ -26,4 +26,4 @@ jobs:
     - run: docker build docker/ --file docker/Dockerfile --tag prauxygo-nodejs
     - run: npm install
     - run: npm test
-    - run: ./node_modules/.bin/codecov --token="c9a1e4a6-4266-475c-b150-3667d8b10060"
+    - run: ./node_modules/.bin/codecov
