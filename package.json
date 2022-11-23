@@ -18,7 +18,7 @@
     "express-subdomain": "^1.0.5",
     "mkdirp": "^1.0.4",
     "mongodb": "^3.5.8",
-    "socket.io": "^2.3.0",
+    "socket.io": "^2.5.0",
     "socket.io-client": "^2.3.0"
   },
   "devDependencies": {
